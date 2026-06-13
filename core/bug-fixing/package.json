@@ -1,0 +1,14 @@
+{
+  "name": "buggy-code",
+  "version": "1.0.0",
+  "description": "",
+  "main": "debugging-assignment.js",
+  "scripts": {
+    "dev": "node debugging-assignment.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
