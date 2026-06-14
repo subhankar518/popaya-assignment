@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-
+import TypeSelector from "../components/TypeSelector";
 import { getSingleNote, updateNote } from "../api/notesApi";
 
 function EditNote() {
@@ -9,6 +9,7 @@ function EditNote() {
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [type, setType] = useState("Generic");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,6 +19,7 @@ function EditNote() {
 
         setTitle(res.data.data.title);
         setContent(res.data.data.content);
+        setType(res.data.data.type);
       } catch (error) {
         console.log(error);
       } finally {
@@ -39,6 +41,7 @@ function EditNote() {
       await updateNote(id, {
         title,
         content,
+        type,
       });
 
       navigate("/");
@@ -62,6 +65,7 @@ function EditNote() {
           placeholder="Title"
           onChange={(e) => setTitle(e.target.value)}
         />
+        <TypeSelector selectedType={type} setSelectedType={setType} />
 
         <textarea
           value={content}

@@ -12,6 +12,20 @@ const noteSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+
+    type: {
+      type: String,
+      enum: [
+        "Generic",
+        "Important",
+        "Personal",
+        "Work",
+        "Study",
+        "Todo",
+        "Reminder",
+      ],
+      default: "Generic",
+    },
   },
   {
     timestamps: true,

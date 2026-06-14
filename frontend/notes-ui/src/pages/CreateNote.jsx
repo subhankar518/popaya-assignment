@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import TypeSelector from "../components/TypeSelector";
 import { createNote } from "../api/notesApi";
 
 function CreateNote() {
@@ -8,6 +8,7 @@ function CreateNote() {
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [type, setType] = useState("Generic");
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -19,6 +20,7 @@ function CreateNote() {
     await createNote({
       title,
       content,
+      type,
     });
 
     navigate("/");
@@ -34,6 +36,7 @@ function CreateNote() {
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Title"
         />
+        <TypeSelector selectedType={type} setSelectedType={setType} />
 
         <textarea
           value={content}

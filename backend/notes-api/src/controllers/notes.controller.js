@@ -4,18 +4,29 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 const createNote = asyncHandler(async (req, res) => {
-  const { title, content } = req?.body;
+  const { title, content, type } = req.body;
 
   if (!title?.trim()) {
     throw new ApiError(400, "Title is required");
   }
 
-  const note = await Note.create({
-    title,
-    content,
-  });
+  const noteData = {
+    title: title.trim(),
+  };
 
-  res.status(201).json(new ApiResponse(201, note, "Note created successfully"));
+  if ("content" in req.body) {
+    noteData.content = content;
+  }
+
+  if ("type" in req.body) {
+    noteData.type = type;
+  }
+
+  const note = await Note.create(noteData);
+
+  return res
+    .status(201)
+    .json(new ApiResponse(201, note, "Note created successfully"));
 });
 
 const getAllNotes = asyncHandler(async (req, res) => {
@@ -43,28 +54,39 @@ const getSingleNote = asyncHandler(async (req, res) => {
 });
 
 const updateNote = asyncHandler(async (req, res) => {
-  const { title, content } = req?.body;
+  const { title, content, type } = req?.body;
   const noteId = req?.params?.id;
 
-  const updatedNote = await Note.findByIdAndUpdate(
-    noteId,
-    {
-      title,
-      content,
-    },
-    {
-      new: true,
-      runValidators: true,
-    },
-  );
+  const updatedNote = {};
 
-  if (!updatedNote) {
+  if ("title" in req.body) {
+    updatedNote.title = title;
+  }
+
+  if ("content" in req.body) {
+    updatedNote.content = content;
+  }
+
+  if ("type" in req.body) {
+    updatedNote.type = type;
+  }
+
+  if (Object.keys(updatedNote).length === 0) {
+    throw new ApiError(400, "At least one field is required to update");
+  }
+
+  const recentUpdatedNote = await Note.findByIdAndUpdate(noteId, updatedNote, {
+    new: true,
+    runValidators: true,
+  });
+
+  if (!recentUpdatedNote) {
     throw new ApiError(404, "Note not found");
   }
 
   res
     .status(200)
-    .json(new ApiResponse(200, updatedNote, "Note updated successfully"));
+    .json(new ApiResponse(200, recentUpdatedNote, "Note updated successfully"));
 });
 
 const deleteNote = asyncHandler(async (req, res) => {
@@ -96,6 +118,12 @@ const searchNotes = asyncHandler(async (req, res) => {
       },
       {
         content: {
+          $regex: searchString,
+          $options: "i",
+        },
+      },
+      {
+        type: {
           $regex: searchString,
           $options: "i",
         },
